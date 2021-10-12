@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.pucmm.examenandroid.placeholder.PlaceholderContent;
@@ -26,6 +27,7 @@ public class ItemFragment extends Fragment implements OnTouchListener<Placeholde
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private boolean hasPermissions = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -36,7 +38,7 @@ public class ItemFragment extends Fragment implements OnTouchListener<Placeholde
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount) {
+    public static ItemFragment newInstance(int columnCount, boolean hasPermissions) {
         ItemFragment fragment = new ItemFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
@@ -74,16 +76,19 @@ public class ItemFragment extends Fragment implements OnTouchListener<Placeholde
 
     @Override
     public void onClick(PlaceholderContentExamen.PlaceholderVersion element) {
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        System.out.println("Has permissions" + hasPermissions);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && hasPermissions) {
             getActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
                     .replace(R.id.fragment_parent, ItemDetailFragment.newInstance(element))
                     .addToBackStack(null)
                     .commit();
-        } else {
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && hasPermissions) {
             getActivity().getSupportFragmentManager().beginTransaction().setReorderingAllowed(true)
                     .replace(R.id.fragment_details, ItemDetailFragment.newInstance(element))
                     .addToBackStack(null)
                     .commit();
+        } else {
+            Toast.makeText(this.getContext(), "You must have all the permissions to proceed.", Toast.LENGTH_LONG).show();
         }
     }
 }
